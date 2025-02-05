@@ -12,19 +12,44 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      # リポジトリをクローン
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Flutterのキャッシュを確認
+      - name: Cache Flutter SDK
+        uses: actions/cache@v3
+        with:
+          path: ~/.flutter
+          key: ${{ runner.os }}-flutter-sdk-${{ hashFiles('.fvm/version', '.flutter-version') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-sdk-
+
+      # Flutterをセットアップ
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.x # 必要なバージョンに変更
+          flutter-version: 3.27.3 # 必要なバージョンに変更
 
+      # Flutterパッケージのキャッシュを確認
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+          key: ${{ runner.os }}-flutter-${{ hashFiles('pubspec.yaml', 'pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-
+
+      # Flutterパッケージをインストール
       - name: Install dependencies
         run: flutter pub get
 
+      # Flutterテスト（単体テスト/結合テスト）
       - name: Run unit tests
         run: flutter test
 
+      # Flutterテスト（ゴールデンテスト）
       - name: Run golden tests
-        run: flutter test --update-goldens
+        run: flutter test # --update-goldens は省略（ローカルで確認する）
