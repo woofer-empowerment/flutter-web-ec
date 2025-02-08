@@ -1,15 +1,12 @@
-name: Run Flutter Tests
+name: Run Tests on PR to Develop
 
 on:
   pull_request:
     branches:
-      - main
-  push:
-    branches:
-      - main
+      - develop # develop への PR 時に実行
 
 jobs:
-  test:
+  ci-tests:
     runs-on: ubuntu-latest
     steps:
       # リポジトリをクローン
@@ -29,7 +26,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.27.3 # 必要なバージョンに変更
+          flutter-version: 3.27.3 # FVMバージョンに揃える
 
       # Flutterパッケージのキャッシュを確認
       - name: Cache Flutter dependencies
@@ -51,5 +48,5 @@ jobs:
         run: flutter test
 
       # Flutterテスト（ゴールデンテスト）
-      - name: Run golden tests
-        run: flutter test # --update-goldens は省略（ローカルで確認する）
+      #- name: Run golden tests
+      #  run: flutter test --update-goldens #省略（ローカルで確認する）
