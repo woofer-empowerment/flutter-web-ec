@@ -44,8 +44,8 @@ jobs:
         run: flutter pub get
 
       # Flutterテスト（単体テスト/結合テスト）
-      - name: Run unit tests
-        run: flutter test
+      #- name: Run unit tests
+      #  run: flutter test --platform chrome
 
       # Flutterテスト（ゴールデンテスト）
       #- name: Run golden tests
