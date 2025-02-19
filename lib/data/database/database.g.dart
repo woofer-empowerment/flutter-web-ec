@@ -70,15 +70,15 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
-  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
-      'created_at', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
   static const VerificationMeta _updatedAtMeta =
       const VerificationMeta('updatedAt');
   @override
-  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
-      'updated_at', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -139,14 +139,10 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     if (data.containsKey('created_at')) {
       context.handle(_createdAtMeta,
           createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
-    } else if (isInserting) {
-      context.missing(_createdAtMeta);
     }
     if (data.containsKey('updated_at')) {
       context.handle(_updatedAtMeta,
           updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
-    } else if (isInserting) {
-      context.missing(_updatedAtMeta);
     }
     return context;
   }
@@ -175,9 +171,9 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
           .typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}image_json'])!),
       createdAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}created_at'])!,
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at']),
       updatedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}updated_at'])!,
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at']),
     );
   }
 
@@ -199,8 +195,8 @@ class Product extends DataClass implements Insertable<Product> {
   final int stock;
   final String? category;
   final List<String> imageJson;
-  final int createdAt;
-  final int updatedAt;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
   const Product(
       {required this.id,
       required this.productId,
@@ -210,8 +206,8 @@ class Product extends DataClass implements Insertable<Product> {
       required this.stock,
       this.category,
       required this.imageJson,
-      required this.createdAt,
-      required this.updatedAt});
+      this.createdAt,
+      this.updatedAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -230,8 +226,12 @@ class Product extends DataClass implements Insertable<Product> {
       map['image_json'] =
           Variable<String>($ProductsTable.$converterimageJson.toSql(imageJson));
     }
-    map['created_at'] = Variable<int>(createdAt);
-    map['updated_at'] = Variable<int>(updatedAt);
+    if (!nullToAbsent || createdAt != null) {
+      map['created_at'] = Variable<DateTime>(createdAt);
+    }
+    if (!nullToAbsent || updatedAt != null) {
+      map['updated_at'] = Variable<DateTime>(updatedAt);
+    }
     return map;
   }
 
@@ -249,8 +249,12 @@ class Product extends DataClass implements Insertable<Product> {
           ? const Value.absent()
           : Value(category),
       imageJson: Value(imageJson),
-      createdAt: Value(createdAt),
-      updatedAt: Value(updatedAt),
+      createdAt: createdAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(createdAt),
+      updatedAt: updatedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(updatedAt),
     );
   }
 
@@ -266,8 +270,8 @@ class Product extends DataClass implements Insertable<Product> {
       stock: serializer.fromJson<int>(json['stock']),
       category: serializer.fromJson<String?>(json['category']),
       imageJson: serializer.fromJson<List<String>>(json['imageJson']),
-      createdAt: serializer.fromJson<int>(json['createdAt']),
-      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+      createdAt: serializer.fromJson<DateTime?>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
     );
   }
   @override
@@ -282,8 +286,8 @@ class Product extends DataClass implements Insertable<Product> {
       'stock': serializer.toJson<int>(stock),
       'category': serializer.toJson<String?>(category),
       'imageJson': serializer.toJson<List<String>>(imageJson),
-      'createdAt': serializer.toJson<int>(createdAt),
-      'updatedAt': serializer.toJson<int>(updatedAt),
+      'createdAt': serializer.toJson<DateTime?>(createdAt),
+      'updatedAt': serializer.toJson<DateTime?>(updatedAt),
     };
   }
 
@@ -296,8 +300,8 @@ class Product extends DataClass implements Insertable<Product> {
           int? stock,
           Value<String?> category = const Value.absent(),
           List<String>? imageJson,
-          int? createdAt,
-          int? updatedAt}) =>
+          Value<DateTime?> createdAt = const Value.absent(),
+          Value<DateTime?> updatedAt = const Value.absent()}) =>
       Product(
         id: id ?? this.id,
         productId: productId ?? this.productId,
@@ -307,8 +311,8 @@ class Product extends DataClass implements Insertable<Product> {
         stock: stock ?? this.stock,
         category: category.present ? category.value : this.category,
         imageJson: imageJson ?? this.imageJson,
-        createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt,
+        createdAt: createdAt.present ? createdAt.value : this.createdAt,
+        updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
       );
   Product copyWithCompanion(ProductsCompanion data) {
     return Product(
@@ -371,8 +375,8 @@ class ProductsCompanion extends UpdateCompanion<Product> {
   final Value<int> stock;
   final Value<String?> category;
   final Value<List<String>> imageJson;
-  final Value<int> createdAt;
-  final Value<int> updatedAt;
+  final Value<DateTime?> createdAt;
+  final Value<DateTime?> updatedAt;
   const ProductsCompanion({
     this.id = const Value.absent(),
     this.productId = const Value.absent(),
@@ -394,13 +398,11 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     this.stock = const Value.absent(),
     this.category = const Value.absent(),
     required List<String> imageJson,
-    required int createdAt,
-    required int updatedAt,
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
   })  : productId = Value(productId),
         name = Value(name),
-        imageJson = Value(imageJson),
-        createdAt = Value(createdAt),
-        updatedAt = Value(updatedAt);
+        imageJson = Value(imageJson);
   static Insertable<Product> custom({
     Expression<int>? id,
     Expression<String>? productId,
@@ -410,8 +412,8 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     Expression<int>? stock,
     Expression<String>? category,
     Expression<String>? imageJson,
-    Expression<int>? createdAt,
-    Expression<int>? updatedAt,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -436,8 +438,8 @@ class ProductsCompanion extends UpdateCompanion<Product> {
       Value<int>? stock,
       Value<String?>? category,
       Value<List<String>>? imageJson,
-      Value<int>? createdAt,
-      Value<int>? updatedAt}) {
+      Value<DateTime?>? createdAt,
+      Value<DateTime?>? updatedAt}) {
     return ProductsCompanion(
       id: id ?? this.id,
       productId: productId ?? this.productId,
@@ -481,10 +483,10 @@ class ProductsCompanion extends UpdateCompanion<Product> {
           $ProductsTable.$converterimageJson.toSql(imageJson.value));
     }
     if (createdAt.present) {
-      map['created_at'] = Variable<int>(createdAt.value);
+      map['created_at'] = Variable<DateTime>(createdAt.value);
     }
     if (updatedAt.present) {
-      map['updated_at'] = Variable<int>(updatedAt.value);
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
     return map;
   }
@@ -527,8 +529,8 @@ typedef $$ProductsTableCreateCompanionBuilder = ProductsCompanion Function({
   Value<int> stock,
   Value<String?> category,
   required List<String> imageJson,
-  required int createdAt,
-  required int updatedAt,
+  Value<DateTime?> createdAt,
+  Value<DateTime?> updatedAt,
 });
 typedef $$ProductsTableUpdateCompanionBuilder = ProductsCompanion Function({
   Value<int> id,
@@ -539,8 +541,8 @@ typedef $$ProductsTableUpdateCompanionBuilder = ProductsCompanion Function({
   Value<int> stock,
   Value<String?> category,
   Value<List<String>> imageJson,
-  Value<int> createdAt,
-  Value<int> updatedAt,
+  Value<DateTime?> createdAt,
+  Value<DateTime?> updatedAt,
 });
 
 class $$ProductsTableFilterComposer
@@ -578,10 +580,10 @@ class $$ProductsTableFilterComposer
           column: $table.imageJson,
           builder: (column) => ColumnWithTypeConverterFilters(column));
 
-  ColumnFilters<int> get createdAt => $composableBuilder(
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get updatedAt => $composableBuilder(
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnFilters(column));
 }
 
@@ -618,10 +620,10 @@ class $$ProductsTableOrderingComposer
   ColumnOrderings<String> get imageJson => $composableBuilder(
       column: $table.imageJson, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get createdAt => $composableBuilder(
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get updatedAt => $composableBuilder(
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
 }
 
@@ -658,10 +660,10 @@ class $$ProductsTableAnnotationComposer
   GeneratedColumnWithTypeConverter<List<String>, String> get imageJson =>
       $composableBuilder(column: $table.imageJson, builder: (column) => column);
 
-  GeneratedColumn<int> get createdAt =>
+  GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
-  GeneratedColumn<int> get updatedAt =>
+  GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
 
@@ -696,8 +698,8 @@ class $$ProductsTableTableManager extends RootTableManager<
             Value<int> stock = const Value.absent(),
             Value<String?> category = const Value.absent(),
             Value<List<String>> imageJson = const Value.absent(),
-            Value<int> createdAt = const Value.absent(),
-            Value<int> updatedAt = const Value.absent(),
+            Value<DateTime?> createdAt = const Value.absent(),
+            Value<DateTime?> updatedAt = const Value.absent(),
           }) =>
               ProductsCompanion(
             id: id,
@@ -720,8 +722,8 @@ class $$ProductsTableTableManager extends RootTableManager<
             Value<int> stock = const Value.absent(),
             Value<String?> category = const Value.absent(),
             required List<String> imageJson,
-            required int createdAt,
-            required int updatedAt,
+            Value<DateTime?> createdAt = const Value.absent(),
+            Value<DateTime?> updatedAt = const Value.absent(),
           }) =>
               ProductsCompanion.insert(
             id: id,
