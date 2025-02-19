@@ -11,8 +11,8 @@ class Products extends Table {
   IntColumn get stock => integer().withDefault(Constant(0))();
   TextColumn get category => text().nullable()();
   TextColumn get imageJson => text().map(const ImagesConverter())();
-  IntColumn get createdAt => integer()();
-  IntColumn get updatedAt => integer()();
+  DateTimeColumn get createdAt => dateTime().nullable()();
+  DateTimeColumn get updatedAt => dateTime().nullable()();
 }
 
 /// String型リスト を JSON で保存するためのコンバータ
