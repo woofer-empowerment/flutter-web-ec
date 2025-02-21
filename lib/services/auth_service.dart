@@ -3,8 +3,8 @@ import 'package:flutter/foundation.dart';
 
 class AuthService {
   final userPool = CognitoUserPool(
-    'ap-southeast-2_93zWhjax4', //ユーザープールIC
-    'shc46q9de654enb85cdag02c3', //アプリクライアントID
+    '', //ユーザープールIC
+    '', //アプリクライアントID
   );
 
   CognitoUser? _currentUser;
