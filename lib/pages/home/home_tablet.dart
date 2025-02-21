@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '/pages/home/home_view_model.dart';
+import 'package:flutter_web_ec/data/database/database.dart';
 
 class HomeTablet extends ConsumerWidget {
-  const HomeTablet({super.key});
+  final AsyncValue<List<Product>> homeState;
+  const HomeTablet({super.key, required this.homeState});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final homeState = ref.watch(homeViewModelProvider);
-
     return Scaffold(
       appBar: AppBar(title: Text("商品一覧（タブレット）")),
       body: homeState.when(
