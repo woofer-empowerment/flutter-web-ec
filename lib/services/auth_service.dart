@@ -7,12 +7,15 @@ class AuthService {
     'shc46q9de654enb85cdag02c3', //アプリクライアントID
   );
 
+  CognitoUser? _currentUser;
+
+  /// サインイン
   Future<CognitoUserSession?> signIn(String email, String password) async {
-    final user = CognitoUser(email, userPool);
+    _currentUser = CognitoUser(email, userPool);
     final authDetails = AuthenticationDetails(username: email, password: password);
 
     try {
-      final session = await user.authenticateUser(authDetails);
+      final session = await _currentUser!.authenticateUser(authDetails);
       return session;
     } catch (e) {
       if (kDebugMode) print('SignIn Error: $e');
@@ -20,6 +23,7 @@ class AuthService {
     }
   }
 
+  /// サインアップ
   Future<bool> signUp(String email, String password) async {
     final userAttributes = [
       AttributeArg(name: 'email', value: email),
@@ -34,7 +38,16 @@ class AuthService {
     }
   }
 
-  Future<void> signOut(CognitoUser user) async {
-    await user.signOut();
+  /// サインアウト
+  Future<void> signOut() async {
+    if (_currentUser != null) {
+      await _currentUser!.signOut();
+      _currentUser = null;
+    }
+  }
+
+  /// ユーザ情報の取得
+  CognitoUser? getCurrentUser() {
+    return _currentUser;
   }
 }
