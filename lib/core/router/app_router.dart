@@ -20,6 +20,7 @@ final GoRouter appRouter = GoRouter(
       },
     ),
   ],
+  errorBuilder: (context, state) => NotFoundPage(),
 );
 
 class GoRouterRefreshStream extends ChangeNotifier {
