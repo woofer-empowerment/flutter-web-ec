@@ -10,7 +10,7 @@ class NotFoundMobile extends ConsumerWidget {
     final homeState = ref.watch(notFoundViewModelProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text("商品一覧（モバイル）")),
+      appBar: AppBar(title: Text("404（モバイル）")),
       body: homeState.when(
         data: (products) => ListView.builder(
           itemCount: products.length,
