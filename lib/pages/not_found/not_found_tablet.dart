@@ -10,7 +10,7 @@ class NotFoundTablet extends ConsumerWidget {
     final homeState = ref.watch(notFoundViewModelProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text("商品一覧（タブレット）")),
+      appBar: AppBar(title: Text("404（タブレット）")),
       body: homeState.when(
         data: (products) => ListView.builder(
           itemCount: products.length,
