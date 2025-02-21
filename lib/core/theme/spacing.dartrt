@@ -1,0 +1,12 @@
+// spacing.dart
+import 'package:flutter/widgets.dart';
+
+class AppSpacing {
+  static const double smallSpacing = 8.0;
+  static const double mediumSpacing = 16.0;
+  static const double largeSpacing = 32.0;
+
+  static const EdgeInsetsGeometry pagePadding = EdgeInsets.all(mediumSpacing);
+  static const EdgeInsetsGeometry sectionPadding = EdgeInsets.symmetric(vertical: mediumSpacing, horizontal: smallSpacing);
+  static const EdgeInsetsGeometry buttonPadding = EdgeInsets.symmetric(vertical: mediumSpacing, horizontal: largeSpacing);
+}
