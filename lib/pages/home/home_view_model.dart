@@ -22,7 +22,7 @@ class HomeViewModel extends AsyncNotifier<List<Product>> {
     if (products.length != 0) return products;
 
     //サンプル処理
-    print("サンプル商品の追加");
+    print("サンプル商品の追加１");
     await productRepository.insertSampleProducts();
     return await productRepository.getAllProducts();
   }
