@@ -1,4 +1,5 @@
 // ignore: avoid_web_libraries_in_flutter
+import '/pages/not_found/not_found_page.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -20,6 +21,7 @@ final GoRouter appRouter = GoRouter(
       },
     ),
   ],
+  errorBuilder: (context, state) => NotFoundPage(),
 );
 
 class GoRouterRefreshStream extends ChangeNotifier {
