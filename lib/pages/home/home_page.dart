@@ -4,17 +4,19 @@ import '../../layouts/responsive_layout.dart';
 import 'home_mobile.dart';
 import 'home_tablet.dart';
 import 'home_desktop.dart';
+import 'home_view_model.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return const Scaffold(
+    final homeState = ref.watch(homeViewModelProvider);
+    return Scaffold(
       body: ResponsiveLayout(
-        mobile: HomeMobile(),
-        tablet: HomeTablet(),
-        desktop: HomeDesktop(),
+        mobile: HomeMobile(homeState: homeState),
+        tablet: HomeTablet(homeState: homeState),
+        desktop: HomeDesktop(homeState: homeState),
       ),
     );
   }
