@@ -15,5 +15,6 @@ void main() {
   testWidgets('flutter setup test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const ProviderScope(child: MyApp()));
+    await tester.pumpAndSettle(); //非同期処理の終了を待つ
   });
 }
